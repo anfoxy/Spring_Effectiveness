@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<html lang="en">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    <title>Личные чаты</title>
+    <link th:href="@{/css/style.css}" rel="stylesheet" />
+</head>
+<body>
+<header th:insert="blocks/header :: header_fragment"></header>
+
+<div th:class="courses-container" th:each="el :${users}" class= "alert alert-info mt-2">
+    <div th:class="course-preview">
+        <h3 th:text="${el.UserLN}"/>
+        <h3 th:text="${el.UserFN}"/>
+       <h3><a th:href="'/profile_personal/'+ ${el.id}">Перейти в чат</a></h3>
+    </div>
+
+</div>
+
+</body>
+</html>

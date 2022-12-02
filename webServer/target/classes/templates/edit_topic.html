@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<html lang="en">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    <title>Проект</title>
+    <link th:href="@{/css/style.css}" rel="stylesheet" />
+</head>
+<body>
+<header th:insert="blocks/header :: header_fragment"></header>
+
+<form class="form"  th:action="'/topic/edit/'+ ${topic.id}" method="post">
+
+    <input class="input" name="nameTopic" type="text"  th:value="''+ ${topic.nameTopic}"  >
+
+    <input class="input" name="category" type="text"  th:value="''+ ${topic.category}">
+
+    <input type="hidden" name="_csrf" value="{{_csrf.token}}" />
+    <div class="frame">
+        <input class="custom-btn btn-5" type="submit" value="Редактировать тему"/>
+        <a th:href="'/topic/'+ ${topic.id}"><input class="custom-btn btn-5" type="submit" value="Отмена"/></a>
+    </div>
+
+</form>
+</body>
+</html>

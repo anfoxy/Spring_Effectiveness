@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.w3.org/1999/xhtml">
+<html lang="en">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    <title>Личный кабинет</title>
+    <link th:href="@{/css/style.css}" rel="stylesheet" />
+</head>
+<body>
+<header th:insert="blocks/header :: header_fragment"></header>
+<div class="card-container">
+  <!--  <img class="round" src="https://sun1-18.userapi.com/impg/M0TPyAzJ9q2pcFRY70cBwPSFi2zweqxQ6Obphg/Wg81Y7MyXGM.jpg?size=1536x2048&quality=95&sign=95c0c2474e9c517ca5d7b40ec4f98736&type=album" alt="user" />
+-->
+
+
+    <h3>[[${user.userLN}]] [[${user.userFN}]]</h3><br>
+    <h3>Email: [[${user.username}]]</h3>
+</div>
+
+</body>
+</html>

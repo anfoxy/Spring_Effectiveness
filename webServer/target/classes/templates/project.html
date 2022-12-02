@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<html lang="en">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    <title>Проект</title>
+    <link th:href="@{/css/style.css}" rel="stylesheet" />
+</head>
+<body>
+<header th:insert="blocks/header :: header_fragment"></header>
+
+
+<figure class="snip1336">
+    <figcaption>
+        <h2>[[${project.projectName}]]<span>Описание проекта</span></h2>
+        <p>[[${project.description}]]</p>
+        <div th:if="${role == 'ROLE_ADMIN'}">
+        <a th:href="'/project/edit/'+ ${project.id}" class="info">Редактировать проект</a>
+        <a th:href="'/project/delete/'+ ${project.id}" class="info">Удалить проект</a>
+        <a th:href="'/topic/add/'+ ${project.id}" class="info">Добавить тему</a>
+        </div>
+    </figcaption>
+    <figcaption>
+        <div class="card1">
+            <div class="card-header content">
+                <h2>Сотрудники проекта</h2>
+            </div>
+            <div class="card-content">
+               <!-- <div class="names">-->
+                <div th:each="el :${users}" class= "names">
+                    <p class="names">[[${el}]]</p>
+
+                </div>
+            </div>
+        </div>
+    </figcaption>
+</figure>
+</div>
+<h4 class="font_proj1">Темы проекта</h4>
+
+<div th:class="courses-container" th:each="el :${topic}" class= "alert alert-info mt-2">
+    <a th:class="noy" th:href="'/topic/'+ ${el.id}">
+        <div th:class="course">
+            <div th:class="bodys">
+                <div th:class="course-preview">
+                    <h5>Название темы</h5>
+                    <h4 th:text="${el.nameTopic}"></h4>
+                </div>
+                <div th:class="course-info">
+                    <div th:class="progress-container">
+                        <div th:class="progress"></div>
+                    </div>
+                    <h5>Категории темы</h5>
+                    <p th:class="opis" th:text="${el.category}"></p>
+                </div>
+            </div>
+        </div>
+    </a>
+</div>
+
+</body>
+</html>
