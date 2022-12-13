@@ -11,5 +11,5 @@ import java.util.Set;
 public interface MessageRepository extends JpaRepository<Message,Long> {
 
 
-    Set<Message> findAllByUserIdInAndRecipientIdIn(Iterable  userId,Iterable  recipient);
+    Set<Message> findAllByUserIdInAndRecipientIdInOrderByIdAsc(Iterable  userId,Iterable  recipient);
 }

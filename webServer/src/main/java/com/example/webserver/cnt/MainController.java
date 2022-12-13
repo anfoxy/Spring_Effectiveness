@@ -6,10 +6,7 @@ import com.example.webserver.model.*;
 import com.example.webserver.repository.ChatRepository;
 import com.example.webserver.repository.TopicRepository;
 import com.example.webserver.repository.UserRepository;
-import com.example.webserver.service.ChatService;
-import com.example.webserver.service.MessageService;
-import com.example.webserver.service.TopicMessageService;
-import com.example.webserver.service.UserService;
+import com.example.webserver.service.*;
 import com.google.gson.Gson;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.messaging.handler.annotation.*;
@@ -18,9 +15,20 @@ import org.springframework.messaging.simp.annotation.SendToUser;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
+import javax.validation.Valid;
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
+import java.io.BufferedOutputStream;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.security.Principal;
 import java.util.*;
 
@@ -130,6 +138,9 @@ public class MainController {
 
         return "chat_user";
     }
+
+
+
     @Autowired
     private SimpMessagingTemplate simpMessagingTemplate;
 
@@ -160,6 +171,27 @@ public class MainController {
         System.out.println("handling send message: " + message + " to: " + to);
         simpMessagingTemplate.convertAndSend("/topic/messages_topic/" + to, message);
     }
+
+
+    private static final String DIR_TO_UPLOAD = "D:\\fileServer\\";
+    @PostMapping("/upload")
+    @ResponseBody
+    public void upload(@RequestPart("file") MultipartFile file) {
+        System.out.println("Uploaded File: ");
+        System.out.println("Name : " + file.getName());
+        System.out.println("Type : " + file.getContentType());
+        System.out.println("Name : " + file.getOriginalFilename());
+        System.out.println("Size : " + file.getSize());
+
+        try {
+        byte[] bytes = file.getBytes();
+        Path path = Paths.get(DIR_TO_UPLOAD + file.getOriginalFilename());
+        Files.write(path, bytes);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
 
 /*    @MessageMapping("/hello")
     public void send(SimpMessageHeaderAccessor sha, @Payload String username) {

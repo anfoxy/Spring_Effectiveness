@@ -20,13 +20,14 @@ function cacheDOM() {
     $chatHistoryList = $chatHistory.find('ul');
 }
 
-function render(message, userName) {
+function render(message, userName, doc) {
     scrollToBottom();
     // responses
     var templateResponse = Handlebars.compile($("#message-response-template").html());
     var contextResponse = {
         response: message,
         time: getCurrentTime(),
+        doc: doc,
         userName: userName
     };
 
@@ -36,7 +37,7 @@ function render(message, userName) {
     }.bind(this), 1500);
 }
 
-function sendMessage(message) {
+function sendMessage(message, doc) {
     let username = $('#userName').val();
     console.log(username)
     sendMsg(username, message);
@@ -46,6 +47,7 @@ function sendMessage(message) {
         var context = {
             messageOutput: message,
             time: getCurrentTime(),
+            doc: doc,
             toUserName: selectedUser
         };
 
@@ -64,7 +66,12 @@ function getCurrentTime() {
 }
 
 function addMessage() {
-    sendMessage($textarea.val());
+    var name = document.getElementById('file');
+    if(name.files.item(0) === null)
+        sendMessage($textarea.val());
+    else
+        sendMessage($textarea.val(),name.files.item(0).name);
+
 }
 
 function addMessageEnter(event) {
@@ -84,9 +91,11 @@ function MessageData() {
 
             if(users[i].userId.username === userName){
                 var template = Handlebars.compile($("#message-template").html());
+
                 var context = {
                     messageOutput: users[i].text,
                     time: users[i].time,
+                    doc: users[i].doc,
                     toUserName: userName
                 };
                 $chatHistoryList.append(template(context));
@@ -96,6 +105,7 @@ function MessageData() {
                 var contextResponse = {
                     response: users[i].text,
                     time: users[i].time,
+                    doc: users[i].doc,
                     userName:  users[i].userId.userFN
                 };
                 $chatHistoryList.append(templateResponse(contextResponse));

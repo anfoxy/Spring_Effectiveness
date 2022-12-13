@@ -1,0 +1,35 @@
+
+CREATE TABLE IF NOT EXISTS public."user"
+(
+    id bigserial NOT NULL,
+    user_name text  NOT NULL,
+    password text NOT NULL,
+    CONSTRAINT user_pkey PRIMARY KEY (id)
+)
+
+CREATE TABLE IF NOT EXISTS public.subject
+(
+    id_sub bigserial NOT NULL,
+    name text COLLATE pg_catalog."default" NOT NULL,
+    id_us bigint NOT NULL,
+    CONSTRAINT subject_pkey PRIMARY KEY (id_sub),
+    CONSTRAINT subject_id_us_fkey FOREIGN KEY (id_us)
+        REFERENCES public."user" (id) MATCH SIMPLE
+        ON UPDATE NO ACTION
+        ON DELETE NO ACTION
+        NOT VALID
+)
+
+CREATE TABLE IF NOT EXISTS public.question
+(
+    id_sub bigint NOT NULL,
+    question text COLLATE pg_catalog."default",
+    answer text COLLATE pg_catalog."default",
+    id_q bigserial NOT NULL ,
+    CONSTRAINT question_pkey PRIMARY KEY (id_q),
+    CONSTRAINT question_id_sub_fkey FOREIGN KEY (id_sub)
+        REFERENCES public.subject (id_sub) MATCH SIMPLE
+        ON UPDATE NO ACTION
+        ON DELETE NO ACTION
+        NOT VALID
+)

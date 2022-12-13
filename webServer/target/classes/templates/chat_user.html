@@ -38,14 +38,16 @@
         </div> <!-- end chat-history -->
 
         <div class="chat-message clearfix">
-            <textarea id="message-to-send" name="message-to-send" placeholder="Type your message" rows="3"></textarea>
 
-       <!--     <i type="file" name="file" class="fa fa-file-o"></i>
--->
-             <input type="file" name="file"><br />
+
+            <textarea id="message-to-send" name="message-to-send" placeholder="Type your message" rows="3"></textarea>
+            <form name="userForm">
+                <input type="file" name="file" id="file"><br />
+            </form>
             <button id="sendBtn">Отправить</button>
 
         </div> <!-- end chat-message -->
+
 
     </div> <!-- end chat -->
 
@@ -58,7 +60,8 @@
             <span class="message-data-name">Я</span> <i class="fa fa-circle me"></i>
         </div>
         <div class="message other-message float-right">
-            {{messageOutput}}
+            {{messageOutput}} <br>
+            <u onclick="savefile('{{doc}}')" >{{doc}}</u>
         </div>
     </li>
 </script>
@@ -70,7 +73,8 @@
             <span class="message-data-time">{{time}}, Сегодня</span>
         </div>
         <div class="message my-message">
-            {{response}}
+            {{response}} <br>
+            <u onclick="savefile('{{doc}}')" >{{doc}}</u>
         </div>
     </li>
 </script>

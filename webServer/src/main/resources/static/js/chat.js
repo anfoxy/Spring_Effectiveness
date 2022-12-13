@@ -1,4 +1,5 @@
 const url = 'http://localhost:8080';
+
 let stompClient;
 let selectedUser;
 let userMain;
@@ -14,10 +15,10 @@ function connectToChat(userName) {
             let data = JSON.parse(response.body);
              if (selectedUser === data.fromLogin) {
                  /*  у меня мои сообщения*/
-                 render(data.text, data.recipientName);
+                 render(data.text, data.recipientName, data.doc);
              } else {
                  /*  у меня чужие сообщения*/
-                newMessages.set(data.fromLogin, data.text);
+                newMessages.set(data.fromLogin, data.text, data.doc);
                 $('#userNameAppender_' + data.fromLogin).append('<span id="newMessage_' + data.fromLogin + '" style="color: red">+1</span>');
             }
         });
@@ -26,26 +27,48 @@ function connectToChat(userName) {
 
 function sendMsg(from,text) {
     let recipientName = document.getElementById("recipientName").value;
-    stompClient.send("/app/chat/" + selectedUser + " " + userMain, {}, JSON.stringify({
-   /*      message: text*/
-        fromLogin: from,
-        doc: null,
-        recipientName: recipientName,
-        text: text
-    }));
+    var name = document.getElementById('file');
+
+
+    if(name.files.item(0) === null){
+        stompClient.send("/app/chat/" + selectedUser + " " + userMain, {}, JSON.stringify({
+            fromLogin: from,
+            doc: null,
+            recipientName: recipientName,
+            text: text
+        }));
+    }else {
+        var formData = new FormData();
+        formData.append("file", name.files.item(0));
+
+        $.ajax({
+            url: "/upload",
+            type: "POST",
+            data: formData,
+            enctype: 'multipart/form-data',
+            processData: false,
+            contentType: false,
+            cache: false,
+            success: function (res) {
+                console.log(res);
+            },
+            error: function (err) {
+                console.error(err);
+            }
+        });
+        stompClient.send("/app/chat/" + selectedUser + " " + userMain, {}, JSON.stringify({
+            fromLogin: from,
+            doc: name.files.item(0).name,
+            recipientName: recipientName,
+            text: text
+        }));
+    }
+
 }
 
-/*function registration() {
-    let userName = document.getElementById("userName").value;
-    $.get(url + "/registration/" + userName, function (response) {
-
-    }).fail(function (error) {
-        if (error.status === 400) {
-            alert("Login is already busy!")
-        }
-    })
-}*/
-
+function savefile(name){
+    window.location.href = "/chats/save_file/" + name;
+}
 function selectUser() {
 
     let userName = document.getElementById("recipient").value;
@@ -59,28 +82,6 @@ function selectUser() {
         element.parentNode.removeChild(element);
         render(newMessages.get(userName), userName);
     }
-/*    $('#selectedUserId').html('');
-    $('#selectedUserId').append('Chat with ' + userName);*/
     connectToChat(user);
     MessageData();
 }
-/*
-function fetchAll() {
-    let userName = document.getElementById("userName").value;
-    $.get(url + "/fetchAllUsers/"+userName, function (response) {
-        let users = response;
-        let usersTemplateHTML = "";
-        for (let i = 0; i < users.length; i++) {
-            usersTemplateHTML = usersTemplateHTML + '<a href="#" onclick="selectUser(\'' + users[i] + '\')"><li class="clearfix">\n' +
-                '                <img src="https://rtfm.co.ua/wp-content/plugins/all-in-one-seo-pack/images/default-user-image.png" width="55px" height="55px" alt="avatar" />\n' +
-                '                <div class="about">\n' +
-                '                    <div id="userNameAppender_' + users[i] + '" class="name">' + users[i] + '</div>\n' +
-                '                    <div class="status">\n' +
-                '                        <i class="fa fa-circle offline"></i>\n' +
-                '                    </div>\n' +
-                '                </div>\n' +
-                '            </li></a>';
-        }
-        $('#usersList').html(usersTemplateHTML);
-    });
-}*/

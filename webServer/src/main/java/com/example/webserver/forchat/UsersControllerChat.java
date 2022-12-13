@@ -7,12 +7,14 @@ import com.example.webserver.repository.*;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.CrossOrigin;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.*;
 
 @RestController
@@ -48,12 +50,30 @@ public class UsersControllerChat {
         User user = userRepository.findUserByUsername(usersStr[0]);
 
 
-        Set<Message> users = messageRepository.findAllByUserIdInAndRecipientIdIn(Arrays.asList(user, recipient),Arrays.asList(user, recipient));
-
-     /*   Set<Message> messages = new HashSet<>();
-        chat.forEach(messages::add);*/
+        Set<Message> users = messageRepository.findAllByUserIdInAndRecipientIdInOrderByIdAsc(Arrays.asList(user, recipient),Arrays.asList(user, recipient));
 
         return users;
     }
+
+
+    @GetMapping("/chats/save_file/{name}")
+    public void  chatToUser( @PathVariable(value = "name") String fileName, HttpServletResponse response) {
+
+        //Авторизованные пользователи смогут скачать файл
+        Path file = Paths.get("D:\\fileServer\\"+ fileName);
+        if (Files.exists(file)){
+            response.setHeader("Content-disposition", "attachment;filename=" + fileName);
+            response.setContentType("application/vnd.ms-excel");
+
+            try {
+                Files.copy(file, response.getOutputStream());
+                response.getOutputStream().flush();
+            } catch (IOException e) {
+                throw new RuntimeException("IOError writing file to output stream");
+            }
+        }
+        System.out.println("Скачиваем файлик "+ fileName);
+    }
+
 }
 

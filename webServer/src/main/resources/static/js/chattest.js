@@ -23,12 +23,12 @@ function connectToChat(userName) {
                 if(data.user !== user){
 
                 /*  у меня мои сообщения*/
-                render(data.text, userFN);
+                render(data.text, userFN, data.doc);
                 }
             } else {
 
                 /*  у меня чужие сообщения*/
-                newMessages.set(data.fromLogin, data.text);
+                newMessages.set(data.fromLogin, data.text, data.doc);
                 $('#userNameAppender_' + data.fromLogin).append('<span id="newMessage_' + data.fromLogin + '" style="color: red">+1</span>');
 
             }
@@ -38,13 +38,59 @@ function connectToChat(userName) {
 
 function sendMsg(from,text) {
     let user = document.getElementById("user").value;
+/*
     stompClient.send("/app/chat_topic/" + selectedUser, {}, JSON.stringify({
-        /*      message: text*/
+        /!*      message: text*!/
         fromLogin: from,
         user: user,
         doc: null,
         text: text
     }));
+
+*/
+
+    var name = document.getElementById('file');
+
+
+    if(name.files.item(0) === null){
+        stompClient.send("/app/chat_topic/" + selectedUser, {}, JSON.stringify({
+            /*      message: text*/
+            fromLogin: from,
+            user: user,
+            doc: null,
+            text: text
+        }));
+
+    }else {
+        var formData = new FormData();
+        formData.append("file", name.files.item(0));
+
+        $.ajax({
+            url: "/upload",
+            type: "POST",
+            data: formData,
+            enctype: 'multipart/form-data',
+            processData: false,
+            contentType: false,
+            cache: false,
+            success: function (res) {
+                console.log(res);
+            },
+            error: function (err) {
+                console.error(err);
+            }
+        });
+
+        stompClient.send("/app/chat_topic/" + selectedUser, {}, JSON.stringify({
+            /*      message: text*/
+            fromLogin: from,
+            user: user,
+            doc: name.files.item(0).name,
+            text: text
+        }));
+    }
+
+
 }
 
 function selectUser() {
@@ -84,13 +130,14 @@ function cacheDOM() {
     $chatHistoryList = $chatHistory.find('ul');
 }
 
-function render(message, userName) {
+function render(message, userName, doc) {
     scrollToBottom();
     // responses
     var templateResponse = Handlebars.compile($("#message-response-template").html());
     var contextResponse = {
         response: message,
         time: getCurrentTime(),
+        doc: doc,
         userName: userName
     };
 
@@ -100,7 +147,7 @@ function render(message, userName) {
     }.bind(this), 1500);
 }
 
-function sendMessage(message) {
+function sendMessage(message, doc) {
     let username = $('#userName').val();
     console.log(username)
     sendMsg(username, message);
@@ -110,6 +157,7 @@ function sendMessage(message) {
         var context = {
             messageOutput: message,
             time: getCurrentTime(),
+            doc: doc,
             toUserName: selectedUser
         };
 
@@ -128,7 +176,11 @@ function getCurrentTime() {
 }
 
 function addMessage() {
-    sendMessage($textarea.val());
+    var name = document.getElementById('file');
+    if(name.files.item(0) === null)
+        sendMessage($textarea.val());
+    else
+        sendMessage($textarea.val(),name.files.item(0).name);
 }
 
 function addMessageEnter(event) {
@@ -136,6 +188,9 @@ function addMessageEnter(event) {
     if (event.keyCode === 13) {
         addMessage();
     }
+}
+function savefile(name){
+    window.location.href = "/chats/save_file/" + name;
 }
 
 function MessageData() {
@@ -152,6 +207,7 @@ function MessageData() {
                 var context = {
                     messageOutput: users[i].text,
                     time: users[i].time,
+                    doc: users[i].doc,
                     toUserName: user
                 };
                 $chatHistoryList.append(template(context));
@@ -161,6 +217,7 @@ function MessageData() {
                 var contextResponse = {
                     response: users[i].text,
                     time: users[i].time,
+                    doc: users[i].doc,
                     userName: users[i].userId.userLN
                 };
                 $chatHistoryList.append(templateResponse(contextResponse));
